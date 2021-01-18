@@ -1,0 +1,35 @@
+---
+- name: Create Corresponding Ansible User
+  become: yes
+  hosts: all
+  remote_user: root
+  vars:
+    - password: "$6$mysupersecret$u9ys8EQG.Kaba3PkiS2smU64UB8qmLIkVBNARpIBapR6EjWxV.f.oR0zw5XNbElOrfQ9P1HYtxohc.ypi93Oz1"
+  gather_facts: no
+  tasks:
+    - name: Add a new user named devops
+      user:
+        name: ansible
+        shell: /bin/bash
+        password: "{{ password }}"
+    - name: Add ansible user to the sudoers
+      copy:
+        dest: "/etc/sudoers.d/devops"
+        content: "ansible  ALL=(ALL)  NOPASSWD: ALL"
+    - name: Deploy SSH Key
+      authorized_key:
+        user: ansible
+        key: "{{ lookup('file', './ansible_rsa.pub') }}"
+        state: present
+    - name: Disable Password Authentication
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: "PasswordAuthentication no"
+        state: present
+        backup: yes
+  handlers:
+   - name: restart ssh
+     service:
+       name: sshd
+       state: restarted

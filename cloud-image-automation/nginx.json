@@ -1,0 +1,26 @@
+{
+ "variables" : {
+    "api_token": "{{env `TF_VAR_do_token`}}",
+    "region": "{{env `TF_VAR_do_region`}}"
+  },
+
+  "builders": [{
+	"type": "digitalocean",
+	"api_token": "{{user `api_token`}}",
+	"image": "ubuntu-20-04-x64",
+	"region": "{{ user `region` }}",
+	"size": "s-1vcpu-1gb",
+	"ssh_username": "root",
+	"snapshot_name": "packer-nginx-0.0.1",
+	"tags": [ "nginx" ]
+  }],
+
+  "provisioners": [
+	{
+	    "type": "shell",
+	    "scripts": [ "nginx_install.sh" ]
+	}
+    ]
+
+
+}

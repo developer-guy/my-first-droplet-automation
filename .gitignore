@@ -1,0 +1,5 @@
+*_rsa
+*.pub
+.terraform
+*.lock.hcl
+hosts
